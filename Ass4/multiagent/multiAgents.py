@@ -48,7 +48,6 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -112,6 +111,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState):
+
         """
           Returns the minimax action from the current gameState using self.depth
           and self.evaluationFunction.
@@ -128,8 +128,54 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
+
         "*** YOUR CODE HERE ***"
+
+        numGhost = gameState.getNumAgents()-1
+        bestValue = self.minimax(self.depth, numGhost, gameState, 1)
+
+        print(bestValue)
+
+        return(gameState.getLegalActions(0)[2])
+
+        # return self.minimax(self.depth, numGhost, self.gameState, 1)
+
         util.raiseNotDefined()
+
+    def minimax(self, depth, numGhost, gameState, maximizingPlayer):
+        print("minimax")
+        if depth == 0 or gameState.getLegalActions()==[]:
+            return self.evaluationFunction(gameState)
+
+        if maximizingPlayer:
+            bestValue = float("-inf")
+            for action in gameState.getLegalActions(0):
+                print ("max " + action)
+                # actions.append(action)
+                value = self.minimax(depth-1, numGhost, gameState.generateSuccessor(0,action), 0)
+                # if value > bestValue:
+                #     print action
+                #     return action
+                bestValue = max(bestValue, value)
+            return bestValue
+
+        else:
+            bestValue = float("inf")
+            for ghost in range(1, numGhost+1):
+                print(range(1,numGhost+1))
+                print (numGhost)
+                print(ghost)
+                for action in gameState.getLegalActions(ghost):
+                    print("min " + action)
+                    value = self.minimax(depth-1, numGhost, gameState.generateSuccessor(ghost, action), 1)
+                    # if value < bestValue:
+                    #     return action
+                    bestValue = min(bestValue, value)
+            return bestValue
+
+
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
