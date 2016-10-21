@@ -185,7 +185,56 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+        numGhost = gameState.getNumAgents()-1
+        alpha = float("-inf")
+        beta = float("inf")
+
+        for action in gameState.getLegalActions(0):
+            newGameState = gameState.generateSuccessor(0, action)
+            value = self.minimax(self.depth, numGhost, newGameState, 1, alpha, beta)
+            if value > alpha:
+                a = action
+                alpha = value
+        return a
         util.raiseNotDefined()
+
+
+    def minimax(self, depth, numGhost, gameState, player, alpha, beta):
+        if (depth == 0 or not gameState.getLegalActions(player)):
+            return self.evaluationFunction(gameState)
+
+        if player == 0:
+            value = float("-inf")
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                minimaxValue = self.minimax(depth, numGhost, newGameState, player + 1, alpha, beta)
+                value = max(value, minimaxValue)
+                if value > beta:
+                    return value
+                alpha = max(alpha, value)
+            return value
+
+        if 0 < player < numGhost:
+            value = float("inf")
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                minimaxValue = self.minimax(depth, numGhost, newGameState, player + 1, alpha, beta)
+                value = min(value, minimaxValue)
+                if value < alpha:
+                    return value
+                beta = min(beta, value)
+            return value
+
+        if player == numGhost:
+            value = float("inf")
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                minimaxValue = self.minimax(depth-1, numGhost, newGameState, 0, alpha, beta)
+                value = min(value, minimaxValue)
+                if value < alpha:
+                    return value
+                beta = min(beta, value)
+            return value
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
