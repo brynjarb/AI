@@ -132,45 +132,43 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
 
         numGhost = gameState.getNumAgents()-1
-        bestValue = self.minimax(self.depth, numGhost, gameState, 1)
+        bestValue = float("-inf")
 
-        print(bestValue)
-
-        return(gameState.getLegalActions(0)[2])
-
-        # return self.minimax(self.depth, numGhost, self.gameState, 1)
-
+        for action in gameState.getLegalActions(0):
+            newGameState = gameState.generateSuccessor(0, action)
+            value = self.minimax(self.depth, numGhost, newGameState, 1)
+            if value > bestValue:
+                a = action
+                bestValue = value
+        return a
         util.raiseNotDefined()
 
-    def minimax(self, depth, numGhost, gameState, maximizingPlayer):
-        print("minimax")
-        if depth == 0 or gameState.getLegalActions()==[]:
+    def minimax(self, depth, numGhost, gameState, player):
+        if (depth == 0 or not gameState.getLegalActions(player)):
             return self.evaluationFunction(gameState)
 
-        if maximizingPlayer:
+        if player == 0:
             bestValue = float("-inf")
-            for action in gameState.getLegalActions(0):
-                print ("max " + action)
-                # actions.append(action)
-                value = self.minimax(depth-1, numGhost, gameState.generateSuccessor(0,action), 0)
-                # if value > bestValue:
-                #     print action
-                #     return action
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                value = self.minimax(depth, numGhost, newGameState, player + 1)
                 bestValue = max(bestValue, value)
             return bestValue
 
-        else:
+        if 0 < player < numGhost:
             bestValue = float("inf")
-            for ghost in range(1, numGhost+1):
-                print(range(1,numGhost+1))
-                print (numGhost)
-                print(ghost)
-                for action in gameState.getLegalActions(ghost):
-                    print("min " + action)
-                    value = self.minimax(depth-1, numGhost, gameState.generateSuccessor(ghost, action), 1)
-                    # if value < bestValue:
-                    #     return action
-                    bestValue = min(bestValue, value)
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                value = self.minimax(depth, numGhost, newGameState, player + 1)
+                bestValue = min(bestValue, value)
+            return bestValue
+
+        if player == numGhost:
+            bestValue = float("inf")
+            for action in gameState.getLegalActions(player):
+                newGameState = gameState.generateSuccessor(player, action)
+                value = self.minimax(depth-1, numGhost, newGameState, 0)
+                bestValue = min(bestValue, value)
             return bestValue
 
 
